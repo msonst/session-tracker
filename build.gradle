@@ -1,0 +1,51 @@
+apply plugin: 'java'
+apply plugin: 'distribution'
+
+group = 'de.sonsts'
+		
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src/main/java'
+			srcDir 'src/generated/java'
+			srcDir 'src/test/java'
+		}
+		resources {
+			srcDir 'src/main/resources'
+			srcDir 'src/test/resources'
+		}
+	}
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "net.researchgate:gradle-release:2.0.2"
+    }
+}
+    
+
+    
+dependencies {
+	compile "log4j:log4j:1.2.17"
+    
+    compile 'net.java.dev.jna:jna:4.2.0'
+    compile 'net.java.dev.jna:jna-platform:4.2.0'
+    compile 'net.java.dev.jna:platform:3.5.2'
+    
+    compile 'io.vertx:vertx-core:3.0.0'
+    compile 'io.vertx:vertx-hazelcast:3.3.3'
+    
+	testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+}
