@@ -1,4 +1,4 @@
-https://app.codeship.com/projects/ce6bc1f0-069e-0135-f11c-1e034e17b246/status?branch=master
+[![Build Status](https://app.codeship.com/projects/ce6bc1f0-069e-0135-f11c-1e034e17b246/status?branch=master)
 
 ## Overview
 
