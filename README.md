@@ -1,4 +1,4 @@
-https://codeship.com/projects/YOUR_PROJECT_UUID/status?branch=master
+https://codeship.com/projects/0bdb0440-3af5-0133-00ea-0ebda3a33bf6/status?branch=master
 
 ## Overview
 
