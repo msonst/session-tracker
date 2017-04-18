@@ -1,0 +1,7 @@
+/bin/
+/build/
+/.vertx/
+/.gradle/
+**.log
+.classpath
+.project
