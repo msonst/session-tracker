@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-repositoryUrl="https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-snapshotRepositoryUrl="https://oss.sonatype.org/content/repositories/snapshots/"
+package de.sonsts.session.tracker.api;
 
-projectDescription=""
-projectUrl=""
-projectPackaging='jar'
+import de.sonsts.session.tracker.api.impl.StateChangeEvent;
 
-scmConnection
-scmDeveloperConnection
-scmUrl
-
-licenseName='The Apache License, Version 2.0'
-licenseUrl='http://www.apache.org/licenses/LICENSE-2.0.txt'
-
-developerId='Michael'
-developerName='Michael Sonst'
-developerEmail='codedorado@gmail.com'
+public interface ISessionStateListener
+{
+    public void onSessionStateChange(StateChangeEvent event);
+}

@@ -16,6 +16,9 @@
 
 package de.sonsts.session.tracker.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import com.sun.jna.WString;
@@ -32,48 +35,29 @@ import com.sun.jna.platform.win32.WinUser.WNDCLASSEX;
 import com.sun.jna.platform.win32.WinUser.WindowProc;
 import com.sun.jna.platform.win32.Wtsapi32;
 
-import de.sonsts.session.tracker.RunState;
-import de.sonsts.session.tracker.StateChangeEvent;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
+import de.sonsts.session.tracker.api.ISessionStateListener;
+import de.sonsts.session.tracker.api.impl.SessionState;
+import de.sonsts.session.tracker.api.impl.StateChangeEvent;
 
-public class SessionTrackerVerticle extends AbstractVerticle implements WindowProc
+public class SessionTracker implements WindowProc
 {
-    private static final Logger LOGGER = Logger.getLogger(SessionTrackerVerticle.class);
+    private static final Logger LOGGER = Logger.getLogger(SessionTracker.class);
     
-    private String mAddress;
-    private long mUpdateCycleMs = 0;
-    private RunState mState = RunState.INVALID;
+    private String mResourceIdentifier;
+    private List<ISessionStateListener> mListener = new ArrayList<>();
+    private StateChangeEvent mLastEvent;
     
-    public SessionTrackerVerticle(String address)
+    public SessionTracker(String resourceIdentifier)
     {
         super();
         
         if (LOGGER.isTraceEnabled())
         {
-            LOGGER.trace("ENTER address=" + address);
+            LOGGER.trace("ENTER");
         }
         
-        mAddress = address;
-        
-        if (LOGGER.isTraceEnabled())
-        {
-            LOGGER.trace("LEAVE");
-        }
-    }
-    
-    public SessionTrackerVerticle(String address, long updateCycleMs)
-    {
-        this(address);
-        
-        if (LOGGER.isTraceEnabled())
-        {
-            LOGGER.trace("ENTER address=" + address + ", updateCycleMs=" + updateCycleMs);
-        }
-        
-        mUpdateCycleMs = updateCycleMs;
+        mResourceIdentifier = resourceIdentifier;
+        mLastEvent = new StateChangeEvent(mResourceIdentifier, System.currentTimeMillis(), SessionState.INVALID);
         
         if (LOGGER.isTraceEnabled())
         {
@@ -127,27 +111,32 @@ public class SessionTrackerVerticle extends AbstractVerticle implements WindowPr
         
         if (retVal != 0)
         {
-            System.out.println("error: " + retVal);
+            LOGGER.error("last error was: " + retVal);
         }
         
         if (LOGGER.isTraceEnabled())
         {
-            LOGGER.trace("send - LEAVE retVal=" + retVal);
+            LOGGER.trace("LEAVE retVal=" + retVal);
         }
         
         return retVal;
     }
     
-    protected void send(StateChangeEvent event)
+    protected void notify(StateChangeEvent event)
     {
         if (LOGGER.isTraceEnabled())
         {
             LOGGER.trace("ENTER event=" + event);
         }
         
-        if (null != vertx)
+        mLastEvent = event;
+        
+        synchronized (mListener)
         {
-            vertx.eventBus().publish(mAddress, new JsonObject(Json.encodePrettily(event)));
+            for (ISessionStateListener l : mListener)
+            {
+                l.onSessionStateChange(event);
+            }
         }
         
         if (LOGGER.isTraceEnabled())
@@ -163,8 +152,7 @@ public class SessionTrackerVerticle extends AbstractVerticle implements WindowPr
             LOGGER.trace("ENTER wParam=" + wParam + ", lParam=" + lParam);
         }
         
-        mState = RunState.valueOf(wParam.intValue());
-        send(new StateChangeEvent(System.currentTimeMillis(), mState));
+        notify(new StateChangeEvent(mResourceIdentifier, System.currentTimeMillis(), SessionState.valueOf(wParam.intValue())));
         
         if (LOGGER.isTraceEnabled())
         {
@@ -172,7 +160,7 @@ public class SessionTrackerVerticle extends AbstractVerticle implements WindowPr
         }
     }
     
-    protected void evaluate()
+    public void evaluate()
     {
         if (LOGGER.isTraceEnabled())
         {
@@ -184,7 +172,7 @@ public class SessionTrackerVerticle extends AbstractVerticle implements WindowPr
         
         WNDCLASSEX wClass = new WNDCLASSEX();
         wClass.hInstance = hInst;
-        wClass.lpfnWndProc = SessionTrackerVerticle.this;
+        wClass.lpfnWndProc = SessionTracker.this;
         wClass.lpszClassName = windowClass;
         
         User32.INSTANCE.RegisterClassEx(wClass);
@@ -214,31 +202,27 @@ public class SessionTrackerVerticle extends AbstractVerticle implements WindowPr
         }
     }
     
-    @Override
-    public void start(Future<Void> startFuture)
+    public void registerListener(ISessionStateListener sessionStateListener)
     {
         if (LOGGER.isTraceEnabled())
         {
-            LOGGER.trace("ENTER");
+            LOGGER.trace("ENTER sessionStateListener=" + sessionStateListener);
         }
         
-        if (mUpdateCycleMs > 0)
+        synchronized (mListener)
         {
-            vertx.setPeriodic(mUpdateCycleMs, t -> send(new StateChangeEvent(t, mState)));
+            mListener.add(sessionStateListener);
         }
-        
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                evaluate();
-            }
-        }).start();
         
         if (LOGGER.isTraceEnabled())
         {
             LOGGER.trace("LEAVE");
         }
+    }
+    
+    public StateChangeEvent getLastEvent()
+    {
+        StateChangeEvent retVal = mLastEvent.deepClone();
+        return retVal;
     }
 }

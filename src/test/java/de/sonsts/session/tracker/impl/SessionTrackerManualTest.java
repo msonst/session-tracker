@@ -16,22 +16,13 @@
 
 package de.sonsts.session.tracker.impl;
 
-import io.vertx.core.Vertx;
-
-public class SessionTrackerVerticleManualTest
+public class SessionTrackerManualTest
 {
-    private static final String ADDRESS = "session-status";
+    private static final String RES_ID = "RES_ID";
     
     public static void main(String[] args)
     {
-        SessionTrackerVerticle uut = new SessionTrackerVerticle(ADDRESS);
-        
-        Vertx vertx = Vertx.vertx();
-        vertx.deployVerticle(uut);
-        
-        vertx.eventBus().consumer(ADDRESS, message -> {
-            System.out.println("Recieved: address:" + message.address() + ", replyAddress=" + message.replyAddress() + ", headers=" + message.headers() + ", body=" + message.body());
-        });
+        SessionTracker uut = new SessionTracker(RES_ID);
         
         uut.evaluate();
     }

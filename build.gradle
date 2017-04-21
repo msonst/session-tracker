@@ -15,10 +15,12 @@
  */
  
 apply plugin: 'java'
-apply plugin: 'distribution'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 group = 'de.sonsts'
-		
+version = '1.000.00.SNAPSHOT'
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -46,7 +48,6 @@ buildscript {
     }
 
     dependencies {
-        classpath "net.researchgate:gradle-release:2.0.2"
     }
 }
     
@@ -65,3 +66,80 @@ dependencies {
 	testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
 }
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    
+     /*repositories {
+                maven {
+                        url "$buildDir/repo"
+                }
+        }*/
+}
+
+/*uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: repositoryUrl) {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: snapshotRepositoryUrl) {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name projectBaseName
+        packaging projectPackaging
+        // optionally artifactId can be defined here 
+        description projectDescription
+        url projectUrl
+
+        scm {
+          connection scmConnection
+          developerConnection scmDeveloperConnection
+          url scmUrl
+        }
+
+        licenses {
+          license {
+            name licenseName
+            url licenseUrl
+          }
+        }
+
+        developers {
+          developer {
+            id developerId
+            name developerName
+            email developerEmail
+          }
+        }
+      }
+    }
+  }
+}*/
