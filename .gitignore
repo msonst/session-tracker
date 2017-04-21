@@ -5,4 +5,4 @@
 **.log
 .classpath
 .project
-.settings
+/.settings/
