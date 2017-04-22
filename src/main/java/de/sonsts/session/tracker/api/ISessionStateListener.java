@@ -16,9 +16,9 @@
 
 package de.sonsts.session.tracker.api;
 
-import de.sonsts.session.tracker.api.impl.StateChangeEvent;
+import de.sonsts.common.SessionState;
 
 public interface ISessionStateListener
 {
-    public void onSessionStateChange(StateChangeEvent event);
+    public void onSessionStateChange(SessionState state);
 }

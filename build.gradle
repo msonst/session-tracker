@@ -25,6 +25,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
+	mavenLocal()
     mavenCentral()
 }
 
@@ -59,6 +60,8 @@ dependencies {
     compile 'net.java.dev.jna:jna:4.2.0'
     compile 'net.java.dev.jna:jna-platform:4.2.0'
     compile 'net.java.dev.jna:platform:3.5.2'
+    
+    compile 'de.sonsts:common:1.000.00.SNAPSHOT'
     
 	testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'

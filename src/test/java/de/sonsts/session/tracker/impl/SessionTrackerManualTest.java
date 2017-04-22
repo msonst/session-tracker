@@ -20,11 +20,9 @@ import de.sonsts.session.tracker.api.impl.SessionTracker;
 
 public class SessionTrackerManualTest
 {
-    private static final String RES_ID = "RES_ID";
-    
     public static void main(String[] args)
     {
-        SessionTracker uut = new SessionTracker(RES_ID);
+        SessionTracker uut = new SessionTracker();
         
         uut.evaluate();
     }

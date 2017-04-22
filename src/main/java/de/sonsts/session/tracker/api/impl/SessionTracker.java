@@ -35,17 +35,17 @@ import com.sun.jna.platform.win32.WinUser.WNDCLASSEX;
 import com.sun.jna.platform.win32.WinUser.WindowProc;
 import com.sun.jna.platform.win32.Wtsapi32;
 
+import de.sonsts.common.SessionState;
 import de.sonsts.session.tracker.api.ISessionStateListener;
 
 public class SessionTracker implements WindowProc
 {
     private static final Logger LOGGER = Logger.getLogger(SessionTracker.class);
     
-    private String mResourceIdentifier;
     private List<ISessionStateListener> mListener = new ArrayList<>();
-    private StateChangeEvent mLastEvent;
+    private SessionState mLastSessionState;
     
-    public SessionTracker(String resourceIdentifier)
+    public SessionTracker()
     {
         super();
         
@@ -54,8 +54,7 @@ public class SessionTracker implements WindowProc
             LOGGER.trace("ENTER");
         }
         
-        mResourceIdentifier = resourceIdentifier;
-        mLastEvent = new StateChangeEvent(mResourceIdentifier, System.currentTimeMillis(), SessionState.INVALID);
+        mLastSessionState = SessionState.INVALID;
         
         if (LOGGER.isTraceEnabled())
         {
@@ -120,20 +119,20 @@ public class SessionTracker implements WindowProc
         return retVal;
     }
     
-    protected void notify(StateChangeEvent event)
+    protected void notify(SessionState state)
     {
         if (LOGGER.isTraceEnabled())
         {
-            LOGGER.trace("ENTER event=" + event);
+            LOGGER.trace("ENTER state=" + state);
         }
         
-        mLastEvent = event;
+        mLastSessionState = state;
         
         synchronized (mListener)
         {
             for (ISessionStateListener l : mListener)
             {
-                l.onSessionStateChange(event);
+                l.onSessionStateChange(state);
             }
         }
         
@@ -150,7 +149,7 @@ public class SessionTracker implements WindowProc
             LOGGER.trace("ENTER wParam=" + wParam + ", lParam=" + lParam);
         }
         
-        notify(new StateChangeEvent(mResourceIdentifier, System.currentTimeMillis(), SessionState.valueOf(wParam.intValue())));
+        notify(SessionState.valueOf(wParam.intValue()));
         
         if (LOGGER.isTraceEnabled())
         {
@@ -218,9 +217,8 @@ public class SessionTracker implements WindowProc
         }
     }
     
-    public StateChangeEvent getLastEvent()
+    public SessionState getLastSessionState()
     {
-        StateChangeEvent retVal = mLastEvent.deepClone();
-        return retVal;
+        return mLastSessionState;
     }
 }
