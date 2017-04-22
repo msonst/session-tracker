@@ -60,9 +60,6 @@ dependencies {
     compile 'net.java.dev.jna:jna-platform:4.2.0'
     compile 'net.java.dev.jna:platform:3.5.2'
     
-    compile 'io.vertx:vertx-core:3.0.0'
-    compile 'io.vertx:vertx-hazelcast:3.3.3'
-    
 	testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
 }
