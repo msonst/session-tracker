@@ -16,6 +16,8 @@
 
 package de.sonsts.session.tracker.impl;
 
+import de.sonsts.session.tracker.api.impl.SessionTracker;
+
 public class SessionTrackerManualTest
 {
     private static final String RES_ID = "RES_ID";

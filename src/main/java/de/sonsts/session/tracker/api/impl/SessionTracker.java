@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.sonsts.session.tracker.impl;
+package de.sonsts.session.tracker.api.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,6 @@ import com.sun.jna.platform.win32.WinUser.WindowProc;
 import com.sun.jna.platform.win32.Wtsapi32;
 
 import de.sonsts.session.tracker.api.ISessionStateListener;
-import de.sonsts.session.tracker.api.impl.SessionState;
-import de.sonsts.session.tracker.api.impl.StateChangeEvent;
 
 public class SessionTracker implements WindowProc
 {
