@@ -33,7 +33,7 @@ targetCompatibility = 1.8
 repositories {
   mavenCentral()
 	
-	maven {
+  maven {
     // Download snapshot, release and staged artifacts from staging group
     url "https://oss.sonatype.org/content/groups/staging"
   }
